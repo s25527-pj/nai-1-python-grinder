@@ -15,6 +15,10 @@ class Node:
         self.vertical_neighbours_positions = vertical_neighbours_positions
 
     def check_neighbouring_nodes_state(self, horizontal: bool, excluded_neighbour_position: int = None):
+        # zeby w pelni zrozumiec dzialanie tej funkcji ponumeruj kazdy z node'ow od 1 do 24 od lewej do prawej
+        # jesli suma jest rowna 2, oznacza to ze w linii znajduja sie 3 node'y o tym samym stanie, czyli naliczony zostanie punkt
+        # takie podejscie pozwala nam rowniez wyeliminowac koniecznosc wykonania petli na calej planszy w celu sprawdzenia, czy powinien zostac naliczony punkt
+        # po kazdym ruchu sprawdzany jest tylko stan node'ow bedacych w relacji trojkowej z nodem, ktorego stan zostal zmieniony.
         sum = 0
         neighbours_positions = self.horizontal_neighbours_positions if horizontal else self.vertical_neighbours_positions
 
@@ -31,7 +35,7 @@ class Node:
         
         return sum
 
-
+# taka struktura planszy pozwala nam pozbyc sie logiki zmiany wspolrzednych, dla kazdego z obiektow. jedyne czym musimy manipulowac to stan naszych node'ow.
 board = [
     Node(1, [2], [10]),
     Node(2, [1, 3], [5]),
