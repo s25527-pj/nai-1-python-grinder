@@ -11,35 +11,49 @@ class NodeState(Enum):
 
 
 class Node:
+    """
+    Represents a node on the board with a position and neighboring node relationships.
+    
+    Attributes:
+    - position: The position of the node on the board (1-24).
+    - horizontal_neighbours_positions: List of positions of horizontally neighboring nodes.
+    - vertical_neighbours_positions: List of positions of vertically neighboring nodes.
+    - state: The current state of the node (EMPTY, PLAYER1, PLAYER2).
+    """
+
     state = NodeState.EMPTY
 
-    def __init__(
-        self,
-        position: int,
-        horizontal_neighbours_positions: list[int],
-        vertical_neighbours_positions: list[int],
-    ):
+    def __init__(self, position: int, horizontal_neighbours_positions: list[int], vertical_neighbours_positions: list[int]):
+        """
+        Initializes a Node with its position and neighboring nodes.
+        """
         self.position = position
         self.horizontal_neighbours_positions = horizontal_neighbours_positions
         self.vertical_neighbours_positions = vertical_neighbours_positions
 
     def __str__(self):
+        """
+        Returns a string representation of the Node, showing its position and color based on its state.
+        """
         if self.state == NodeState.EMPTY:
             return str(self.position)
         else:
             color = "red" if self.state == NodeState.PLAYER1 else "green"
-
             return colored(str(self.position), color)
 
-    def get_matching_neighbour_count(
-        self, horizontal: bool, excluded_neighbour_position: int = None
-    ):
+    def get_matching_neighbour_count(self, horizontal: bool, excluded_neighbour_position: int = None):
+        """
+        Recursively counts the number of neighboring nodes with the same state, either horizontally or vertically.
+
+        Args:
+        - horizontal: True to check horizontal neighbors, False to check vertical neighbors.
+        - excluded_neighbour_position: The position of the neighboring node to exclude from the check (optional).
+
+        Returns:
+        The count of neighboring nodes with the same state.
+        """
         sum = 0
-        neighbours_positions = (
-            self.horizontal_neighbours_positions
-            if horizontal
-            else self.vertical_neighbours_positions
-        )
+        neighbours_positions = self.horizontal_neighbours_positions if horizontal else self.vertical_neighbours_positions
 
         for position in neighbours_positions:
             if position is excluded_neighbour_position:
@@ -49,13 +63,12 @@ class Node:
 
             if self.state == neighbouring_node.state:
                 sum += 1
-                sum += neighbouring_node.get_matching_neighbour_count(
-                    horizontal, self.position
-                )
+                sum += neighbouring_node.get_matching_neighbour_count(horizontal, self.position)
 
         return sum
 
 
+# Initialize the game board with 24 nodes and their respective neighbors.
 board = [
     Node(1, [2], [10]),
     Node(2, [1, 3], [5]),
@@ -88,6 +101,9 @@ player_2_checkers = 9
 
 
 def get_board_representation():
+    """
+    Returns a string representation of the current game board, showing each node's position and state.
+    """
     return f"""
 {board[0]}            {board[1]}            {board[2]}
     {board[3]}        {board[4]}        {board[5]}
@@ -100,11 +116,14 @@ def get_board_representation():
 
 
 def put_checker_on_board(player: int):
-    position = int(
-        input(
-            f"Player {player}, enter the position (1-24) where you'd like to place your checker: "
-        )
-    )
+    """
+    Allows the current player to place a checker on an empty position on the board.
+    If the player forms a mill (3 checkers in a row), the player can remove one of the opponent's checkers.
+
+    Args:
+    - player: The current player (1 or 2).
+    """
+    position = int(input(f"Player {player}, enter the position (1-24) where you'd like to place your checker: "))
 
     try:
         node = board[position - 1]
@@ -114,9 +133,7 @@ def put_checker_on_board(player: int):
         return
 
     if node.state != NodeState.EMPTY:
-        print(
-            f"Position {position} is already occupied. Please choose another position."
-        )
+        print(f"Position {position} is already occupied. Please choose another position.")
         put_checker_on_board(player)
         return
 
@@ -125,10 +142,7 @@ def put_checker_on_board(player: int):
     os.system("cls")
     print(get_board_representation())
 
-    if (
-        node.get_matching_neighbour_count(True) == 2
-        or node.get_matching_neighbour_count(False) == 2
-    ):
+    if node.get_matching_neighbour_count(True) == 2 or node.get_matching_neighbour_count(False) == 2:
         print(f"Player {player}, you scored a point!")
 
         if player == 1:
@@ -142,14 +156,15 @@ def put_checker_on_board(player: int):
 
 
 def move_checker_on_board(player: int):
-    from_position = int(
-        input(f"Player {player}, enter the position of the checker you want to move: ")
-    )
-    to_position = int(
-        input(
-            f"Player {player}, enter the position where you want to move the checker: "
-        )
-    )
+    """
+    Allows the current player to move one of their checkers to an adjacent empty position on the board.
+    If the move forms a mill, the player can remove one of the opponent's checkers.
+
+    Args:
+    - player: The current player (1 or 2).
+    """
+    from_position = int(input(f"Player {player}, enter the position of the checker you want to move: "))
+    to_position = int(input(f"Player {player}, enter the position where you want to move the checker: "))
 
     try:
         from_node = board[from_position - 1]
@@ -164,20 +179,13 @@ def move_checker_on_board(player: int):
         move_checker_on_board(player)
         return
 
-    if (
-        from_node.position not in to_node.horizontal_neighbours_positions
-        and from_node.position not in to_node.vertical_neighbours_positions
-    ):
-        print(
-            f"Invalid move. You can only move to a neighboring position. Position {to_position} is not adjacent to position {from_position}."
-        )
+    if from_node.position not in to_node.horizontal_neighbours_positions and from_node.position not in to_node.vertical_neighbours_positions:
+        print(f"Invalid move. You can only move to a neighboring position. Position {to_position} is not adjacent to position {from_position}.")
         move_checker_on_board(player)
         return
 
     if to_node.state != NodeState.EMPTY:
-        print(
-            f"Invalid move. Position {to_position} is already occupied. Please choose another position."
-        )
+        print(f"Invalid move. Position {to_position} is already occupied. Please choose another position.")
         move_checker_on_board(player)
         return
 
@@ -187,10 +195,7 @@ def move_checker_on_board(player: int):
     os.system("cls")
     print(get_board_representation())
 
-    if (
-        to_node.get_matching_neighbour_count(True) == 2
-        or to_node.get_matching_neighbour_count(False) == 2
-    ):
+    if to_node.get_matching_neighbour_count(True) == 2 or to_node.get_matching_neighbour_count(False) == 2:
         print(f"Player {player}, you scored a point!")
 
         if player == 1:
@@ -204,10 +209,14 @@ def move_checker_on_board(player: int):
 
 
 def remove_checker_from_board(player: int):
+    """
+    Allows the current player to remove one of the opponent's checkers after scoring a point.
+
+    Args:
+    - player: The current player (1 or 2).
+    """
     opponent = 2 if player == 1 else 1
-    position = int(
-        input(f"Enter the position (1-24) of Player {opponent}'s checker to remove: ")
-    )
+    position = int(input(f"Enter the position (1-24) of Player {opponent}'s checker to remove: "))
 
     try:
         node = board[position - 1]
@@ -217,9 +226,7 @@ def remove_checker_from_board(player: int):
         return
 
     if node.state != NodeState(opponent):
-        print(
-            f"Invalid move. You can only remove Player {opponent}'s checker. Please choose another position."
-        )
+        print(f"Invalid move. You can only remove Player {opponent}'s checker. Please choose another position.")
         remove_checker_from_board(player)
         return
 
