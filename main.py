@@ -1,3 +1,10 @@
+"""
+authors: Maksymilian Mrówka, Maciej Uzarski
+Nine Mens Morris (polish: Młynek [lit. "grinder"])
+rules [pol]:https://pl.wikipedia.org/wiki/M%C5%82ynek_(gra)
+rules [eng]:https://en.wikipedia.org/wiki/Nine_men%27s_morris
+"""
+
 from enum import Enum
 import os
 import random
