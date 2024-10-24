@@ -120,13 +120,20 @@ def get_board_representation():
     Returns a string representation of the current game board, showing each node's position and state.
     """
     return f"""
-{board[0]}            {board[1]}            {board[2]}
-    {board[3]}        {board[4]}        {board[5]}
-         {board[6]}   {board[7]}    {board[8]}
-{board[9]}  {board[10]}  {board[11]}        {board[12]}  {board[13]}  {board[14]}
-        {board[15]}   {board[16]}   {board[17]}
-    {board[18]}       {board[19]}       {board[20]}
-{board[21]}           {board[22]}           {board[23]}
+        {board[0]}----------{board[1]}----------{board[2]}
+        |          |          |
+        |   {board[3]}------{board[4]}------{board[5]}   |
+        |   |      |      |   |
+        |   |  {board[6]}---{board[7]}---{board[8]}  |   |
+        |   |  |       |  |   |
+        {board[9]}-{board[10]}-{board[11]}       {board[12]}-{board[13]}-{board[14]}
+        |   |  |       |  |   |
+        |   |  {board[15]}--{board[16]}--{board[17]} |   |
+        |   |      |      |   |
+        |   {board[18]}-----{board[19]}-----{board[20]}  |
+        |          |          |
+        {board[21]}---------{board[22]}---------{board[23]}
+
 """
 
 
