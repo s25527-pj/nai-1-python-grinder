@@ -3,6 +3,7 @@ import os
 import random
 from colorama import init
 from termcolor import colored
+from time import sleep
 
 
 class NodeState(Enum):
@@ -332,29 +333,66 @@ def generate_possible_moves(player: int):
     return possible_moves
 
 
+def check_if_mill_formed(position):
+    """
+    Checks if placing a checker at 'position' forms a mill (three in a row).
+    """
+    node = board[position]
+
+    # Check horizontal neighbors
+    horizontal_neighbours = node.horizontal_neighbours_positions
+    if (
+        len(horizontal_neighbours) == 2
+    ):  # Check if this node has two horizontal neighbors
+        if (
+            board[horizontal_neighbours[0] - 1].state == node.state
+            and board[horizontal_neighbours[1] - 1].state == node.state
+        ):
+            return True
+
+    # Check vertical neighbors
+    vertical_neighbours = node.vertical_neighbours_positions
+    if len(vertical_neighbours) == 2:  # Check if this node has two vertical neighbors
+        if (
+            board[vertical_neighbours[0] - 1].state == node.state
+            and board[vertical_neighbours[1] - 1].state == node.state
+        ):
+            return True
+
+    return False
+
+
 def minimax(depth, is_maximizing_player):
     """
-    Minimax algorithm to evaluate the best move for the AI (Player 2).
+    Minimax algorithm for AI to evaluate the game tree.
+    - depth: The depth to look ahead (number of moves).
+    - is_maximizing_player: True if it's the maximizing player's turn (AI), False for minimizing player (human).
     """
     if depth == 0 or player_1_checkers == 2 or player_2_checkers == 2:
         return evaluate_board()
 
     if is_maximizing_player:
         max_eval = float("-inf")
-        for move in generate_possible_moves(2):  # Player 2
-            # Simulate placing a checker
+        for move in generate_possible_moves(2):  # AI (Player 2) moves
             board[move - 1].state = NodeState.PLAYER2
-            eval = minimax(depth - 1, False)
-            board[move - 1].state = NodeState.EMPTY  # Undo the move
+            if check_if_mill_formed(move - 1):  # Check if the move forms a mill
+                eval = 100  # Assign a very high value for forming a mill
+            else:
+                eval = minimax(depth - 1, False)  # Recursively call minimax
+            board[move - 1].state = NodeState.EMPTY  # Undo move
             max_eval = max(max_eval, eval)
         return max_eval
     else:
         min_eval = float("inf")
-        for move in generate_possible_moves(1):  # Player 1
-            # Simulate placing a checker
+        for move in generate_possible_moves(1):  # Human (Player 1) moves
             board[move - 1].state = NodeState.PLAYER1
-            eval = minimax(depth - 1, True)
-            board[move - 1].state = NodeState.EMPTY  # Undo the move
+            if check_if_mill_formed(move - 1):  # Check if the move forms a mill
+                eval = (
+                    -100
+                )  # Assign a very low value for allowing Player 1 to form a mill
+            else:
+                eval = minimax(depth - 1, True)  # Recursively call minimax
+            board[move - 1].state = NodeState.EMPTY  # Undo move
             min_eval = min(min_eval, eval)
         return min_eval
 
@@ -383,7 +421,6 @@ def ai_place_checker():
 
     # Place the checker in the best position
     board[best_move - 1].state = NodeState.PLAYER2
-    print(f"AI placed a checker at position {best_move}")
     os.system("cls")
     print(get_board_representation())
 
@@ -394,6 +431,7 @@ def ai_place_checker():
         or node.get_matching_neighbour_count(False) == 2
     ):
         print("AI scored a point!")
+        sleep(1.5)
         global player_1_checkers
         player_1_checkers -= 1
         ai_remove_player_1_checker()  # Call AI's strategic removal function
@@ -437,6 +475,7 @@ def ai_move_checker():
         print(
             f"AI moved checker from position {from_position} to position {to_position}"
         )
+        sleep(1.5)
         os.system("cls")
         print(get_board_representation())
 
@@ -447,6 +486,7 @@ def ai_move_checker():
             or to_node.get_matching_neighbour_count(False) == 2
         ):
             print(f"Player 2 (AI) scored a point!")
+            sleep(1.5)
             global player_1_checkers
             player_1_checkers -= 1
             ai_remove_player_1_checker()
@@ -494,6 +534,7 @@ def ai_remove_player_1_checker():
     # Remove the selected checker
     board[node_to_remove.position - 1].state = NodeState.EMPTY
     print(f"AI removed Player 1's checker from position {node_to_remove.position}")
+    sleep(1.5)
 
     # Refresh the board display
     os.system("cls")
