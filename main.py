@@ -4,7 +4,9 @@ Nine Mens Morris (polish: Młynek [lit. "grinder"])
 rules [pol]: https://pl.wikipedia.org/wiki/M%C5%82ynek_(gra)
 rules [eng]: https://en.wikipedia.org/wiki/Nine_men%27s_morris
 
-Note: This version of the game does not include a draw condition.
+Notes:
+- This version of the game does not include a draw condition.
+- There is no possibility to move your checker to non-adjacent fields when left with only 3 checkers.
 
 ## Setup and Running Instructions:
 
