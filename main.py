@@ -1,9 +1,72 @@
 """
 authors: Maksymilian Mrówka, Maciej Uzarski
 Nine Mens Morris (polish: Młynek [lit. "grinder"])
-rules [pol]:https://pl.wikipedia.org/wiki/M%C5%82ynek_(gra)
-rules [eng]:https://en.wikipedia.org/wiki/Nine_men%27s_morris
+rules [pol]: https://pl.wikipedia.org/wiki/M%C5%82ynek_(gra)
+rules [eng]: https://en.wikipedia.org/wiki/Nine_men%27s_morris
+
+Note: This version of the game does not include a draw condition.
+
+## Setup and Running Instructions:
+
+### 1. Install Python (if you don’t have it already)
+   - Download the latest version of Python from the official website: [https://www.python.org/downloads/](https://www.python.org/downloads/).
+   - Install Python, ensuring you check the option to "Add Python to PATH" during installation.
+
+### 2. Verify Python Installation
+   - Open your command line interface (Command Prompt, PowerShell, or terminal).
+   - Type the following command to check if Python is installed and the version:
+
+     ```bash
+     python --version
+     ```
+
+   - If Python is installed correctly, it should return the installed version number.
+
+### 3. Install pip (Python Package Installer)
+   - Python usually comes with pip pre-installed. To check if pip is installed, type:
+
+     ```bash
+     pip --version
+     ```
+
+   - If pip is not installed, you can install it by following the instructions here: [https://pip.pypa.io/en/stable/installation/](https://pip.pypa.io/en/stable/installation/).
+
+### 4. Download or Clone the Project Files
+   - Download the project files from the repository or clone the project using Git (if you have it installed).
+
+     To clone using Git:
+     ```bash
+     git clone <repository_url>
+     ```
+
+   - Make sure the project directory contains the following files:
+     - The Python game script (e.g., `main.py`)
+     - A `requirements.txt` file (for dependencies like `colorama` and `termcolor`)
+
+### 5. Navigate to the Project Directory
+   - Open the command line interface and navigate to the project directory where the `main.py` and `requirements.txt` files are located.
+
+     ```bash
+     cd path/to/project_directory
+     ```
+
+### 6. Install Required Python Packages
+   - Use `pip` to install all required dependencies from the `requirements.txt` file:
+
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+### 7. Run the Game
+   - Once the dependencies are installed, run the game using Python:
+
+     ```bash
+     python main.py
+     ```
+
+   - Enjoy playing Nine Men's Morris!
 """
+
 
 from enum import Enum
 import os
