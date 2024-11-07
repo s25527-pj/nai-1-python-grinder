@@ -1,3 +1,30 @@
+"""
+Air Defense System Simulation
+Authors: Maciej Uzarski, Maksymilian Mrówka
+
+Description:
+This simulation demonstrates a fuzzy logic-based air defense system that calculates a threat level based on a missile's distance, speed, and angle of approach.
+The system continuously calculates the threat level as the missile approaches a target. This project is intended to model how a threat level would change
+under different missile approach conditions.
+
+Environment Setup:
+1. Navigate to the directory
+    - cd path/to/fuzzy_logic
+
+2. Install necessary dependencies:
+    - pip install -r requirements.txt
+
+3. Run the code:
+   - Execute the script with `python main.py`
+
+4. Controls:
+   - Input fields for Distance (0-1000), Speed (0-5), and Angle (0-180) can be clicked and updated.
+   - Press 'Update' to set the new values.
+
+The simulation updates the missile's position and recalculates the threat level on each iteration, offering a real-time view of threat assessment based on proximity, speed, and trajectory.
+
+"""
+
 import pygame
 import numpy as np
 import skfuzzy as fuzz
@@ -135,6 +162,15 @@ def calculate_threat(distance_value, speed_value, angle_value):
 
 
 def draw_text_input(label, text, x, y):
+    """
+    Draws a text input field with a label on the screen.
+
+    Parameters:
+    - label (str): Label text for the input field.
+    - text (str): The current text in the input field.
+    - x (int): X-coordinate of the input field.
+    - y (int): Y-coordinate of the input field.
+    """
     label_surface = font.render(label, True, BLACK)
     text_surface = font.render(text, True, BLACK)
     screen.blit(label_surface, (x, y - 30))
