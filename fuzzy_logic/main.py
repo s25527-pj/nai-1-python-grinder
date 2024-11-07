@@ -6,7 +6,7 @@ import math
 
 # Initialize Pygame
 pygame.init()
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((1200, 800))
 pygame.display.set_caption("Air Defense System Simulation")
 
 # Colors
@@ -19,15 +19,15 @@ GREEN = (0, 255, 0)
 
 # Input 1: Distance of the missile
 distance = ctrl.Antecedent(np.arange(0, 1001, 1), 'distance')
-distance['near'] = fuzz.trapmf(distance.universe, [0, 0, 50, 200])
-distance['moderate'] = fuzz.trimf(distance.universe, [100, 300, 500])
+distance['near'] = fuzz.trapmf(distance.universe, [0, 0, 30, 100])
+distance['moderate'] = fuzz.trimf(distance.universe, [80, 300, 500])
 distance['far'] = fuzz.trapmf(distance.universe, [400, 700, 1000, 1000])
 
 # Input 2: Speed of the missile
 speed = ctrl.Antecedent(np.arange(0, 5, 0.1), 'speed')
-speed['slow'] = fuzz.trapmf(speed.universe, [0, 0, 0.5, 1.5])
+speed['slow'] = fuzz.trapmf(speed.universe, [0, 0, 0.5, 1.0])
 speed['medium'] = fuzz.trimf(speed.universe, [0.5, 1.5, 3.0])
-speed['fast'] = fuzz.trapmf(speed.universe, [1.5, 3.5, 5.0, 5.0])
+speed['fast'] = fuzz.trapmf(speed.universe, [2.0, 3.5, 5.0, 5.0])
 
 # Input 3: Angle of approach
 angle = ctrl.Antecedent(np.arange(0, 181, 1), 'angle')
@@ -36,13 +36,14 @@ angle['medium'] = fuzz.trimf(angle.universe, [30, 60, 120])
 angle['large'] = fuzz.trapmf(angle.universe, [90, 150, 180, 180])
 
 # Output: Threat Level
-threat_level = ctrl.Consequent(np.arange(0, 101, 1), 'threat_level')
-threat_level['low'] = fuzz.trapmf(threat_level.universe, [0, 0, 20, 40])
-threat_level['moderate'] = fuzz.trimf(threat_level.universe, [20, 50, 80])
-threat_level['high'] = fuzz.trapmf(threat_level.universe, [60, 80, 100, 100])
+threat_level = ctrl.Consequent(np.arange(0, 100, 1), 'threat_level')
+threat_level['low'] = fuzz.trapmf(threat_level.universe, [0, 0, 10, 30])
+threat_level['moderate'] = fuzz.trimf(threat_level.universe, [25, 50, 75])
+threat_level['high'] = fuzz.trapmf(threat_level.universe, [60, 85, 100, 100])
 
 # Updated rules for more granularity in near distances and extreme conditions
 rules = [
+    # Near distance with different speeds and angles for smoother increase
     ctrl.Rule(distance['near'] & speed['slow'] & angle['small'], threat_level['moderate']),
     ctrl.Rule(distance['near'] & speed['slow'] & angle['medium'], threat_level['moderate']),
     ctrl.Rule(distance['near'] & speed['slow'] & angle['large'], threat_level['low']),
@@ -53,9 +54,12 @@ rules = [
     ctrl.Rule(distance['near'] & speed['fast'] & angle['medium'], threat_level['high']),
     ctrl.Rule(distance['near'] & speed['fast'] & angle['large'], threat_level['high']),
 
-    # Added rule to ensure high threat level when missile is near with high speed
+    # Ensure high threat level when missile is near, regardless of angle, at high speed
     ctrl.Rule(distance['near'] & speed['fast'], threat_level['high']),
+    ctrl.Rule(distance['near'] & speed['medium'], threat_level['high']),
+    ctrl.Rule(distance['near'] & speed['slow'], threat_level['moderate']),
 
+    # Moderate distance with different speeds and angles
     ctrl.Rule(distance['moderate'] & speed['slow'] & angle['small'], threat_level['moderate']),
     ctrl.Rule(distance['moderate'] & speed['slow'] & angle['medium'], threat_level['low']),
     ctrl.Rule(distance['moderate'] & speed['slow'] & angle['large'], threat_level['low']),
@@ -66,9 +70,10 @@ rules = [
     ctrl.Rule(distance['moderate'] & speed['fast'] & angle['medium'], threat_level['high']),
     ctrl.Rule(distance['moderate'] & speed['fast'] & angle['large'], threat_level['moderate']),
 
-    # Additional high-threat conditions at moderate distances with high speed
+    # Additional rule to ensure high threat level at moderate distance with high speed
     ctrl.Rule(distance['moderate'] & speed['fast'], threat_level['high']),
 
+    # Far distance with different speeds and angles
     ctrl.Rule(distance['far'] & speed['slow'] & angle['small'], threat_level['low']),
     ctrl.Rule(distance['far'] & speed['slow'] & angle['medium'], threat_level['low']),
     ctrl.Rule(distance['far'] & speed['slow'] & angle['large'], threat_level['low']),
@@ -78,6 +83,9 @@ rules = [
     ctrl.Rule(distance['far'] & speed['fast'] & angle['small'], threat_level['high']),
     ctrl.Rule(distance['far'] & speed['fast'] & angle['medium'], threat_level['moderate']),
     ctrl.Rule(distance['far'] & speed['fast'] & angle['large'], threat_level['moderate']),
+
+    # Added rule to push high threat when near distance is reached
+    ctrl.Rule(distance['near'], threat_level['high'])
 ]
 
 # Control system and simulation setup
@@ -97,6 +105,10 @@ def calculate_threat(distance_value, speed_value, angle_value):
     Returns:
     - float: Calculated threat level percentage.
     """
+
+    if distance_value < 20 and speed_value > 4.5:
+        return 100.0
+
     threat_simulation.input['distance'] = distance_value
     threat_simulation.input['speed'] = speed_value
     threat_simulation.input['angle'] = angle_value
@@ -108,12 +120,12 @@ def calculate_threat(distance_value, speed_value, angle_value):
 
 # Initial parameters for the missile
 distance_value = 500  # Initial distance
-speed_value = 5  # Speed in Mach
-angle_value = 10  # Angle of approach in degrees
+speed_value = 3  # Speed in Mach
+angle_value = 340  # Angle of approach in degrees
 
 # Main game loop
 running = True
-target_position = (400, 300)  # Center of the screen as the base position
+target_position = (600, 400)  # Center of the screen as the base position
 
 while running:
     screen.fill(WHITE)
@@ -139,7 +151,7 @@ while running:
     pygame.draw.circle(screen, GREEN, target_position, 20)  # Base
 
     # Update distance to simulate missile approaching
-    distance_value -= 2
+    distance_value -= 6
     if distance_value <= 0:
         distance_value = 1000  # Reset for continuous simulation
 
