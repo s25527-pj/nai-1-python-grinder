@@ -14,6 +14,11 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
+
+# Define fonts
+font = pygame.font.SysFont(None, 36)
 
 # Define fuzzy variables for the inputs and output
 
@@ -36,7 +41,7 @@ angle['medium'] = fuzz.trimf(angle.universe, [30, 60, 120])
 angle['large'] = fuzz.trapmf(angle.universe, [90, 150, 180, 180])
 
 # Output: Threat Level
-threat_level = ctrl.Consequent(np.arange(0, 100, 1), 'threat_level')
+threat_level = ctrl.Consequent(np.arange(0, 101, 1), 'threat_level')
 threat_level['low'] = fuzz.trapmf(threat_level.universe, [0, 0, 10, 30])
 threat_level['moderate'] = fuzz.trimf(threat_level.universe, [25, 50, 75])
 threat_level['high'] = fuzz.trapmf(threat_level.universe, [60, 85, 100, 100])
@@ -92,6 +97,17 @@ rules = [
 threat_ctrl = ctrl.ControlSystem(rules)
 threat_simulation = ctrl.ControlSystemSimulation(threat_ctrl)
 
+# Missile parameters
+distance_value = 500
+speed_value = 3
+angle_value = 90
+
+# Text input fields
+distance_input = ""
+speed_input = ""
+angle_input = ""
+active_input = None  # Track active input field
+button_rect = pygame.Rect(950, 600, 150, 40)  # "Update" button position
 
 def calculate_threat(distance_value, speed_value, angle_value):
     """
@@ -118,10 +134,14 @@ def calculate_threat(distance_value, speed_value, angle_value):
     return threat_simulation.output['threat_level']
 
 
-# Initial parameters for the missile
-distance_value = 500  # Initial distance
-speed_value = 3  # Speed in Mach
-angle_value = 340  # Angle of approach in degrees
+def draw_text_input(label, text, x, y):
+    label_surface = font.render(label, True, BLACK)
+    text_surface = font.render(text, True, BLACK)
+    screen.blit(label_surface, (x, y - 30))
+    pygame.draw.rect(screen, WHITE, pygame.Rect(x, y, 140, 40))  # Input field background
+    pygame.draw.rect(screen, BLACK, pygame.Rect(x, y, 140, 40), 2)  # Input field border
+    # screen.blit(label_surface, (x - 100, y + 5))
+    screen.blit(text_surface, (x + 5, y + 5))
 
 # Main game loop
 running = True
@@ -130,25 +150,65 @@ target_position = (600, 400)  # Center of the screen as the base position
 while running:
     screen.fill(WHITE)
 
+    # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if button_rect.collidepoint(event.pos):  # Check if "Update" button is clicked
+                try:
+                    distance_value = float(distance_input) if distance_input else distance_value
+                    speed_value = float(speed_input) if speed_input else speed_value
+                    angle_value = float(angle_input) if angle_input else angle_value
+                except ValueError:
+                    pass  # Ignore invalid input
+            elif pygame.Rect(900, 100, 140, 40).collidepoint(event.pos):
+                active_input = "distance"
+            elif pygame.Rect(900, 200, 140, 40).collidepoint(event.pos):
+                active_input = "speed"
+            elif pygame.Rect(900, 300, 140, 40).collidepoint(event.pos):
+                active_input = "angle"
+            else:
+                active_input = None  # Deselect input field
+
+        elif event.type == pygame.KEYDOWN and active_input:
+            if event.key == pygame.K_BACKSPACE:
+                if active_input == "distance":
+                    distance_input = distance_input[:-1]
+                elif active_input == "speed":
+                    speed_input = speed_input[:-1]
+                elif active_input == "angle":
+                    angle_input = angle_input[:-1]
+            else:
+                if active_input == "distance":
+                    distance_input += event.unicode
+                elif active_input == "speed":
+                    speed_input += event.unicode
+                elif active_input == "angle":
+                    angle_input += event.unicode
 
     # Calculate threat level
     threat_level_value = calculate_threat(distance_value, speed_value, angle_value)
 
     # Display threat level
-    font = pygame.font.SysFont(None, 36)
     text = font.render(f"Threat Level: {threat_level_value:.2f}%", True, RED)
     screen.blit(text, (10, 10))
 
-    # Calculate missile's position based on distance and angle
+    # Display missile position
     missile_x = target_position[0] + distance_value * math.cos(math.radians(angle_value))
     missile_y = target_position[1] - distance_value * math.sin(math.radians(angle_value))
-
-    # Draw the missile and base
     pygame.draw.circle(screen, BLUE, (int(missile_x), int(missile_y)), 10)  # Missile
     pygame.draw.circle(screen, GREEN, target_position, 20)  # Base
+
+    # Draw text input fields and labels
+    draw_text_input("Distance (0-1000, +/-1):", distance_input, 900, 100)
+    draw_text_input("Speed (0-5, +/- 0.1):", speed_input, 900, 200)
+    draw_text_input("Angle (0-180, +/-1):", angle_input, 900, 300)
+
+    # Draw "Update" button
+    pygame.draw.rect(screen, GRAY, button_rect)
+    button_text = font.render("Update", True, BLACK)
+    screen.blit(button_text, (button_rect.x + 20, button_rect.y + 5))
 
     # Update distance to simulate missile approaching
     distance_value -= 6
