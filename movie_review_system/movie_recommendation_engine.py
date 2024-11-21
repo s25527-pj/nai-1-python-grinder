@@ -89,3 +89,12 @@ print("\nMovies to Avoid:", recommendations['avoid'])
 print("Reasons for Avoidance:")
 for movie, reason in recommendations['avoid_reasons'].items():
     print(f"{movie}: {reason}")
+
+print("========================")
+cluster_1_movies = df[df['Cluster'] == 1]
+
+print("Movies in cluster 1:")
+print(cluster_1_movies[['Movie', 'Genre', 'Subgenre']])
+
+cluster_1_mean_rating = cluster_1_movies['Rating'].mean()
+print(f"\nAverage rating for cluster 1: {cluster_1_mean_rating}")
