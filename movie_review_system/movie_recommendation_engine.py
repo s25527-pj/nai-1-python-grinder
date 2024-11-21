@@ -1,4 +1,3 @@
-
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -8,13 +7,19 @@ file_path = 'rated_movies.xlsx'  # Replace with your file path
 data = pd.ExcelFile(file_path)
 df = data.parse('Sheet1')
 
-# Encode genres
-label_encoder_genre = LabelEncoder()
-df['Genre_encoded'] = label_encoder_genre.fit_transform(df['Genre'])
+# Fill missing values in "Subgenre" with a default value
+df['Subgenre'] = df['Subgenre'].fillna('Brak subgatunku')
 
-# Scale numerical data
+# Encode "Genre" and "Subgenre"
+label_encoder_genre = LabelEncoder()
+label_encoder_subgenre = LabelEncoder()
+
+df['Genre_encoded'] = label_encoder_genre.fit_transform(df['Genre'])
+df['Subgenre_encoded'] = label_encoder_subgenre.fit_transform(df['Subgenre'])
+
+# Scale numerical data (Rating, Genre_encoded, Subgenre_encoded)
 scaler = StandardScaler()
-scaled_features = scaler.fit_transform(df[['Rating', 'Genre_encoded']])
+scaled_features = scaler.fit_transform(df[['Rating', 'Genre_encoded', 'Subgenre_encoded']])
 
 # Perform clustering
 kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
@@ -53,7 +58,7 @@ def recommend_movies(user, df, top_n=5):
     }
 
 # Example usage
-user = "Benedykt Borowski"
+user = input("Please enter your name to get movie recommendations: ")
 recommendations = recommend_movies(user, df)
 print(f"Recommendations for {user}:")
 print("Recommended Movies:", recommendations['recommend'])
