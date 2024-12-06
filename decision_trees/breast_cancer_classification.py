@@ -1,3 +1,29 @@
+"""
+Breast Cancer Classification System
+Authors: Maksymilian Mrówka, Maciej Uzarski
+
+Environment Setup:
+1. Navigate to the directory containing the script:
+    - cd path/to/decision_trees
+
+2. Install necessary dependencies:
+    - pip install -r requirements.txt
+
+3. Run the code:
+    - Execute the script with `python breast_cancer_classification.py`
+
+Description:
+- The script classifies breast cancer tumors as either malignant (M) or benign (B) based on features from the breast cancer dataset.
+- Two classification algorithms are implemented:
+  1. CART (Classification and Regression Trees) using the DecisionTreeClassifier.
+  2. SVM (Support Vector Machine) using the SVC classifier with an RBF kernel.
+- The dataset is preprocessed by removing the first column (ID), mapping the target variable to binary values (M → 1, B → 0), and splitting the data into training and test sets.
+- For SVM, feature scaling is applied using StandardScaler to normalize the data.
+- Evaluation is conducted using accuracy scores on the test dataset for both models.
+- The script also visualizes the trained decision tree.
+"""
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -14,7 +40,7 @@ df = df.drop(df.columns[0], axis=1).reset_index(drop=True)
 
 # CART
 decision_tree = DecisionTreeClassifier(
-    max_depth=4, min_samples_split=10, random_state=42
+    max_depth=4, min_samples_split=10, random_state=34
 )
 x = df.iloc[:, 1:].reset_index(drop=True)
 y = df.iloc[:, 0].map({"M": 1, "B": 0})
@@ -44,7 +70,7 @@ print(
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
-svm = SVC(kernel="rbf", C=1.0, gamma="scale", random_state=42)
+svm = SVC(kernel="rbf", C=1.0, gamma="scale", random_state=12)
 
 svm.fit(X_train_scaled, y_train)
 
