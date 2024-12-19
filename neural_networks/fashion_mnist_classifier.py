@@ -1,3 +1,35 @@
+"""
+Comparison of Neural Network Architectures for Fashion MNIST Classification
+Author: Maksymilian Mrówka, Maciej Uzarski
+
+Environment Setup:
+1. Navigate to the directory containing the script:
+    - cd path/to/neural_networks
+2. Ensure necessary dependencies are installed:
+    - pip install -r requirements.txt
+3. Run the script:
+    - Execute the script with `python fashion_mnist_classifier.py`
+
+Description:
+- This script compares the performance of two neural network architectures (small and large) on the Fashion MNIST dataset.
+- The Fashion MNIST dataset contains 70,000 grayscale images of size 28x28 across 10 fashion categories. The dataset is divided into 60,000 training images and 10,000 test images.
+- Key features of the script:
+  1. **Small Neural Network**:
+     - Input layer: Flattens the 28x28 image into a 1D array.
+     - Dense layer: 64 neurons with ReLU activation.
+     - Output layer: 10 neurons with softmax activation for classification.
+  2. **Large Neural Network**:
+     - Input layer: Flattens the 28x28 image into a 1D array.
+     - Dense layers: 256 and 128 neurons with ReLU activation.
+     - Output layer: 10 neurons with softmax activation.
+- Both networks are trained using the Adam optimizer, sparse categorical cross-entropy loss, and accuracy as a metric over 5 epochs with validation on the test dataset.
+- Results:
+  - Loss and accuracy are computed and compared for both networks on the test dataset.
+- A confusion matrix is generated for the larger network, visualizing the model's performance across all categories.
+- The confusion matrix is displayed using a `viridis` colormap for better interpretability.
+"""
+
+
 import matplotlib
 matplotlib.use('TkAgg')
 import tensorflow as tf

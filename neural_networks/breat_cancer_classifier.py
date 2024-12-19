@@ -1,3 +1,29 @@
+"""
+Breast Cancer Classification Using Neural Networks
+Author: Maksymilian Mrówka, Maciej Uzarski
+
+Environment Setup:
+1. Navigate to the directory containing the script:
+    - cd path/to/neural_networks
+2. Install required dependencies:
+    - pip install -r requirements.txt
+3. Run the script:
+    - Execute the script with `python breast_cancer_classifier.py`
+
+Description:
+- This script implements a neural network model to classify breast cancer tumors as malignant (M) or benign (B).
+- It uses a dataset in CSV format, removing irrelevant columns (`id`) and converting labels (`diagnosis`) to binary values (M → 1, B → 0).
+- The input data is split into training and test sets, and features are standardized using `StandardScaler` for optimal neural network performance.
+- The neural network architecture consists of:
+  1. Input layer: Fully connected layer with 64 neurons and ReLU activation.
+  2. Hidden layer: Fully connected layer with 32 neurons and ReLU activation.
+  3. Output layer: Single neuron with sigmoid activation for binary classification.
+- The model is compiled using the Adam optimizer and binary cross-entropy loss function, with accuracy as the evaluation metric.
+- Training is conducted over 10 epochs with a validation split.
+- The script outputs the model's loss and accuracy on the test dataset.
+"""
+
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
