@@ -36,8 +36,10 @@ def detect_gesture_and_fingers(landmarks):
         gesture = "OK"
     elif not folded[0] and not folded[1] and not folded[2] and folded[3] and folded[4]:  # "Three"
         gesture = "Three"
-    elif not folded[2] and folded[1] and folded[3] and folded[4]:  # "Three"
+    elif not folded[2] and folded[1] and folded[3] and folded[4]:  # "Middle finger"
         gesture = "That's not very nice"
+    elif not folded[0] and not folded[4] and folded[1] and folded[2] and folded[3]:  # "Phone"
+        gesture = "Phone"
     else:
         gesture = "Unknown"
 
