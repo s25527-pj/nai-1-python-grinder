@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import pygame
 
 # Inicjalizacja MediaPipe do śledzenia dłoni
 mp_hands = mp.solutions.hands
@@ -49,12 +50,15 @@ def detect_gesture_and_fingers(landmarks):
 # Kamera
 cap = cv2.VideoCapture(0)
 
+pygame.mixer.init()
+pygame.mixer.music.load("music.mp3")
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         print("Couldn't read input from camera")
         break
-
+    
     # Obróbka obrazu
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(image)
@@ -68,6 +72,18 @@ while cap.isOpened():
             # Wykrywanie gestu i stanu palców
             landmarks = hand_landmarks.landmark
             gesture, finger_states = detect_gesture_and_fingers(landmarks)
+            
+            if gesture == "OK":
+                pygame.mixer.music.play()
+                
+            if gesture == "Palm":
+                pygame.mixer.music.pause()
+                
+            if gesture == "Three":
+                pygame.mixer.music.unpause()
+                
+            elif gesture == "That's not very nice":
+                pygame.mixer.music.stop()
 
             # Wyświetlanie gestu
             cv2.putText(image, f"Gesture: {gesture}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
